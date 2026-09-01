@@ -1,3 +1,6 @@
+
+
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -129,62 +132,88 @@
             opacity: 0.9;
         }
         
-        /* Marquee de nomes */
-        .nomes-marquee {
+        /* ===== NOME EM DESTAQUE (BALÃO ESTOURANDO) ===== */
+        .nomes-destaque {
             flex: 1;
             min-width: 200px;
-            overflow: hidden;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             background: rgba(255,255,255,0.08);
             border-radius: 30px;
-            padding: 6px 0;
+            padding: 8px 20px;
             border: 1px solid rgba(212, 167, 98, 0.3);
+            position: relative;
+            overflow: hidden;
         }
         
-        .nomes-marquee .track {
-            display: flex;
-            animation: scrollNomes 20s linear infinite;
-            white-space: nowrap;
-        }
-        
-        .nomes-marquee .track span {
-            display: inline-block;
-            padding: 0 30px;
-            font-size: 1rem;
-            font-weight: 500;
+        .nome-atual {
+            font-size: 1.4rem;
+            font-weight: 700;
             color: #F6ECDD;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
+            text-shadow: 0 0 20px rgba(212, 167, 98, 0.3);
+            transition: all 0.5s ease;
+            position: relative;
+            padding: 0 10px;
+        }
+        
+        .nome-atual .icone-fogos {
+            display: inline-block;
+            margin: 0 8px;
+            font-size: 1.2rem;
+            animation: estourar 0.5s ease;
+        }
+        
+        @keyframes estourar {
+            0% { transform: scale(0) rotate(-20deg); opacity: 0; }
+            60% { transform: scale(1.5) rotate(10deg); opacity: 1; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+        
+        .nome-atual .destaque-nome {
+            display: inline-block;
+            animation: surgirNome 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
             position: relative;
         }
         
-        .nomes-marquee .track span::after {
-            content: '🏆';
-            margin-left: 8px;
-            font-size: 0.9rem;
+        @keyframes surgirNome {
+            0% { transform: scale(0.3) rotate(-10deg); opacity: 0; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
         }
         
-        .nomes-marquee .track span:not(:last-child)::before {
-            content: '•';
-            position: absolute;
-            right: -5px;
-            color: #D4A762;
+        .nome-atual .badge-numero {
+            display: inline-block;
+            background: #D4A762;
+            color: #271705;
+            font-size: 0.7rem;
             font-weight: 700;
+            padding: 2px 10px;
+            border-radius: 20px;
+            margin-left: 10px;
+            vertical-align: middle;
+            animation: surgirNome 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
         
-        @keyframes scrollNomes {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
+        /* Contador de participantes */
+        .contador-participantes {
+            font-size: 0.75rem;
+            color: #D4A762;
+            opacity: 0.8;
+            margin-left: 15px;
+            white-space: nowrap;
         }
         
-        /* Pausa no hover */
-        .nomes-marquee:hover .track {
-            animation-play-state: paused;
+        .contador-participantes span {
+            font-weight: 700;
+            font-size: 1rem;
         }
         
         /* Indicador de carregamento */
         .loading-nomes {
             color: #aaa;
             font-size: 0.9rem;
-            padding: 0 20px;
         }
         
         .loading-nomes i {
@@ -195,6 +224,22 @@
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
+        }
+        
+        /* Partículas de confete (opcional) */
+        .confete {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: voarConfete 1.5s ease-out forwards;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        @keyframes voarConfete {
+            0% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(0) rotate(720deg); opacity: 0; }
         }
         
         /* ===== HEADER ===== */
@@ -467,8 +512,13 @@
                 text-align: center;
             }
             
-            .nomes-marquee {
+            .nomes-destaque {
                 width: 100%;
+                min-height: 45px;
+            }
+            
+            .nome-atual {
+                font-size: 1.1rem;
             }
             
             .nav-container {
@@ -499,14 +549,17 @@
         <div class="container">
             <div class="sorteio-info">
                 <span class="icone-taca">🏆</span>
-                <h3>Sorteio Vaquejada 2026</h3>
+                <h3>Sorteio Festa do Vaqueiro 2026</h3>
                 <span class="data-sorteio">25/09/2026</span>
                 <span class="mensagem">✨ Fique tranquilo, você está concorrendo!</span>
             </div>
-            <div class="nomes-marquee" id="nomesMarquee">
-                <div class="track" id="nomesTrack">
-                    <span class="loading-nomes"><i class="fas fa-spinner"></i> Carregando participantes...</span>
+            <div class="nomes-destaque" id="nomesDestaque">
+                <div class="nome-atual" id="nomeAtual">
+                    <span class="loading-nomes"><i class="fas fa-spinner"></i> Carregando...</span>
                 </div>
+                <span class="contador-participantes" id="contadorParticipantes">
+                    <i class="fas fa-users"></i> <span id="totalParticipantes">0</span>
+                </span>
             </div>
         </div>
     </section>
@@ -662,7 +715,7 @@
 
     <script>
         // Configuração do Firebase
-        const firebaseConfig = {
+          const firebaseConfig = {
             apiKey: "AIzaSyCU8MvIGFvS-OZ9gaB5sc68c1rwbQ3nAfo",
             authDomain: "classickids-eb0ba.firebaseapp.com",
             databaseURL: "https://classickids-eb0ba.firebaseio.com",
@@ -681,7 +734,14 @@
         const tsStoreRef = database.ref('TSstore');
 
         // Elementos DOM
-        const nomesTrack = document.getElementById('nomesTrack');
+        const nomeAtualEl = document.getElementById('nomeAtual');
+        const totalParticipantesEl = document.getElementById('totalParticipantes');
+
+        // Variáveis de controle
+        let nomes = [];
+        let indiceAtual = 0;
+        let intervaloNomes = null;
+        let estaPausado = false;
 
         // Função para extrair APENAS o nome do cliente (último elemento do array)
         function extrairNome(valor) {
@@ -692,17 +752,14 @@
                 try {
                     const parsed = JSON.parse(valor);
                     if (Array.isArray(parsed) && parsed.length > 0) {
-                        // Último elemento do array é o nome
                         return parsed[parsed.length - 1];
                     }
                 } catch (e) {
-                    // Se não for JSON válido, tenta extrair com regex
                     const match = valor.match(/"([^"]*)"\]\s*$/);
                     if (match) return match[1];
                 }
             }
             
-            // Se já for um array
             if (Array.isArray(valor) && valor.length > 0) {
                 return valor[valor.length - 1];
             }
@@ -710,72 +767,138 @@
             return null;
         }
 
-        // Função para carregar e exibir os nomes
+        // Função para criar confetes
+        function criarConfetes(container) {
+            const cores = ['#D4A762', '#F6ECDD', '#FF6B6B', '#4ECDC4', '#FFE66D', '#A8E6CF'];
+            const numConfetes = 12;
+            
+            for (let i = 0; i < numConfetes; i++) {
+                const confete = document.createElement('div');
+                confete.className = 'confete';
+                const angulo = Math.random() * 2 * Math.PI;
+                const distancia = 30 + Math.random() * 60;
+                const tx = Math.cos(angulo) * distancia;
+                const ty = Math.sin(angulo) * distancia - 20;
+                confete.style.setProperty('--tx', tx + 'px');
+                confete.style.setProperty('--ty', ty + 'px');
+                confete.style.background = cores[Math.floor(Math.random() * cores.length)];
+                confete.style.width = (4 + Math.random() * 6) + 'px';
+                confete.style.height = (4 + Math.random() * 6) + 'px';
+                confete.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+                confete.style.top = '50%';
+                confete.style.left = '50%';
+                confete.style.position = 'absolute';
+                confete.style.animationDuration = (0.8 + Math.random() * 0.8) + 's';
+                container.appendChild(confete);
+                
+                setTimeout(() => confete.remove(), 2000);
+            }
+        }
+
+        // Função para mostrar o próximo nome (em ordem aleatória)
+        function mostrarProximoNome() {
+            if (nomes.length === 0) {
+                nomeAtualEl.innerHTML = '<span style="color: #D4A762;">📢 Aguardando participantes...</span>';
+                return;
+            }
+
+            // Escolhe um índice aleatório diferente do atual
+            let novoIndice;
+            do {
+                novoIndice = Math.floor(Math.random() * nomes.length);
+            } while (novoIndice === indiceAtual && nomes.length > 1);
+            
+            indiceAtual = novoIndice;
+            const nome = nomes[indiceAtual];
+            
+            // Emojis aleatórios para o efeito de "estouro"
+            const emojis = ['🎉', '🔥', '⭐', '💥', '✨', '🎊', '🏆'];
+            const emoji = emojis[Math.floor(Math.random() * emojis.length)];
+            
+            // Cria o HTML com animação
+            nomeAtualEl.innerHTML = `
+                <span class="icone-fogos">${emoji}</span>
+                <span class="destaque-nome">${nome}</span>
+                <span class="badge-numero">#${indiceAtual + 1}</span>
+            `;
+            
+            // Efeito de confetes
+            const container = document.getElementById('nomesDestaque');
+            criarConfetes(container);
+        }
+
+        // Função para carregar os nomes do Firebase
         function carregarNomes() {
             tsStoreRef.once('value')
                 .then((snapshot) => {
                     const dados = snapshot.val();
-                    const nomes = [];
+                    const nomesLista = [];
                     
                     if (dados) {
-                        // Itera sobre cada cliente no nó TSstore
                         Object.keys(dados).forEach((key) => {
                             const cliente = dados[key];
                             const nome = extrairNome(cliente);
                             
                             if (nome && typeof nome === 'string' && nome.trim() !== '') {
-                                // Filtra nomes que parecem ser números de telefone ou valores indesejados
                                 const nomeLimpo = nome.trim();
-                                // Ignora se for apenas números ou se parecer um telefone
                                 if (!/^[\d\s\(\)\-]+$/.test(nomeLimpo) && nomeLimpo.length > 1) {
-                                    nomes.push(nomeLimpo);
+                                    nomesLista.push(nomeLimpo);
                                 }
                             }
                         });
                     }
                     
-                    // Remove duplicatas
-                    const nomesUnicos = [...new Set(nomes)];
+                    // Remove duplicatas e embaralha
+                    const nomesUnicos = [...new Set(nomesLista)];
+                    nomes = nomesUnicos;
                     
-                    // Atualiza o marquee
-                    atualizarMarquee(nomesUnicos);
+                    // Atualiza contador
+                    totalParticipantesEl.textContent = nomes.length;
+                    
+                    // Inicia ou reinicia o ciclo de exibição
+                    if (nomes.length > 0) {
+                        // Para o intervalo anterior se existir
+                        if (intervaloNomes) {
+                            clearInterval(intervaloNomes);
+                        }
+                        
+                        // Mostra o primeiro nome
+                        indiceAtual = Math.floor(Math.random() * nomes.length);
+                        mostrarProximoNome();
+                        
+                        // Inicia o intervalo para trocar a cada 2 segundos
+                        intervaloNomes = setInterval(mostrarProximoNome, 2000);
+                    } else {
+                        nomeAtualEl.innerHTML = '<span style="color: #D4A762;">📢 Nenhum participante cadastrado ainda.</span>';
+                        totalParticipantesEl.textContent = '0';
+                    }
                 })
                 .catch((error) => {
                     console.error('Erro ao carregar dados do Firebase:', error);
-                    nomesTrack.innerHTML = '<span style="color: #ff6b6b;">⚠️ Erro ao carregar participantes. Tente novamente.</span>';
+                    nomeAtualEl.innerHTML = '<span style="color: #ff6b6b;">⚠️ Erro ao carregar participantes.</span>';
                 });
         }
 
-        // Função para atualizar o marquee com os nomes
-        function atualizarMarquee(nomes) {
-            if (!nomes || nomes.length === 0) {
-                nomesTrack.innerHTML = '<span style="color: #D4A762;">📢 Nenhum participante cadastrado ainda. Seja o primeiro!</span>';
-                return;
+        // Pausar ao passar o mouse
+        document.getElementById('nomesDestaque').addEventListener('mouseenter', function() {
+            if (intervaloNomes) {
+                clearInterval(intervaloNomes);
+                estaPausado = true;
             }
+        });
 
-            // Duplica a lista para criar o efeito infinito
-            const nomesDuplicados = [...nomes, ...nomes, ...nomes];
-            
-            // Cria o HTML com os nomes
-            let html = '';
-            nomesDuplicados.forEach((nome, index) => {
-                html += `<span>${nome}</span>`;
-            });
-            
-            nomesTrack.innerHTML = html;
-            
-            // Ajusta a duração da animação baseado na quantidade de nomes
-            const totalNomes = nomes.length;
-            // Quanto mais nomes, mais lento (entre 15s e 60s)
-            const duracao = Math.max(15, Math.min(60, totalNomes * 1.2));
-            nomesTrack.style.animationDuration = duracao + 's';
-        }
+        document.getElementById('nomesDestaque').addEventListener('mouseleave', function() {
+            if (estaPausado && nomes.length > 0) {
+                intervaloNomes = setInterval(mostrarProximoNome, 2000);
+                estaPausado = false;
+            }
+        });
 
-        // Carrega os nomes ao iniciar
+        // Inicializa
         document.addEventListener('DOMContentLoaded', function() {
             carregarNomes();
             
-            // Recarrega a cada 5 minutos para manter atualizado
+            // Recarrega a cada 5 minutos
             setInterval(carregarNomes, 300000);
         });
     </script>
