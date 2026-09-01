@@ -22,6 +22,10 @@
     <title>Terrace Store - Loja de Roupas Masculinas em Porto da Folha, Sergipe | A Marca do Sertão</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
     <!-- Schema.org markup for Google -->
     <script type="application/ld+json">
     {
@@ -68,7 +72,132 @@
             padding: 0 20px;
         }
         
-        /* Header e Navegação */
+        /* ===== BALÃO DE SORTEIO - TOPO ===== */
+        .sorteio-banner {
+            background: linear-gradient(135deg, #271705, #4a2a0f);
+            color: #F6ECDD;
+            padding: 12px 0;
+            border-bottom: 3px solid #D4A762;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .sorteio-banner .container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .sorteio-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-shrink: 0;
+        }
+        
+        .sorteio-info .icone-taca {
+            font-size: 28px;
+            color: #D4A762;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+        
+        .sorteio-info h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #D4A762;
+            letter-spacing: 1px;
+        }
+        
+        .sorteio-info .data-sorteio {
+            font-size: 0.85rem;
+            background: #D4A762;
+            color: #271705;
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        
+        .sorteio-info .mensagem {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        /* Marquee de nomes */
+        .nomes-marquee {
+            flex: 1;
+            min-width: 200px;
+            overflow: hidden;
+            background: rgba(255,255,255,0.08);
+            border-radius: 30px;
+            padding: 6px 0;
+            border: 1px solid rgba(212, 167, 98, 0.3);
+        }
+        
+        .nomes-marquee .track {
+            display: flex;
+            animation: scrollNomes 20s linear infinite;
+            white-space: nowrap;
+        }
+        
+        .nomes-marquee .track span {
+            display: inline-block;
+            padding: 0 30px;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #F6ECDD;
+            letter-spacing: 0.5px;
+            position: relative;
+        }
+        
+        .nomes-marquee .track span::after {
+            content: '🏆';
+            margin-left: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .nomes-marquee .track span:not(:last-child)::before {
+            content: '•';
+            position: absolute;
+            right: -5px;
+            color: #D4A762;
+            font-weight: 700;
+        }
+        
+        @keyframes scrollNomes {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        
+        /* Pausa no hover */
+        .nomes-marquee:hover .track {
+            animation-play-state: paused;
+        }
+        
+        /* Indicador de carregamento */
+        .loading-nomes {
+            color: #aaa;
+            font-size: 0.9rem;
+            padding: 0 20px;
+        }
+        
+        .loading-nomes i {
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* ===== HEADER ===== */
         header {
             background-color: #F6ECDD;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -322,6 +451,26 @@
         
         /* Responsividade */
         @media (max-width: 768px) {
+            .sorteio-banner .container {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }
+            
+            .sorteio-info {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .sorteio-info .mensagem {
+                width: 100%;
+                text-align: center;
+            }
+            
+            .nomes-marquee {
+                width: 100%;
+            }
+            
             .nav-container {
                 flex-direction: column;
             }
@@ -345,6 +494,23 @@
     </style>
 </head>
 <body>
+    <!-- ===== BALÃO DE SORTEIO ===== -->
+    <section class="sorteio-banner" id="sorteio">
+        <div class="container">
+            <div class="sorteio-info">
+                <span class="icone-taca">🏆</span>
+                <h3>Sorteio Vaquejada 2026</h3>
+                <span class="data-sorteio">25/09/2026</span>
+                <span class="mensagem">✨ Fique tranquilo, você está concorrendo!</span>
+            </div>
+            <div class="nomes-marquee" id="nomesMarquee">
+                <div class="track" id="nomesTrack">
+                    <span class="loading-nomes"><i class="fas fa-spinner"></i> Carregando participantes...</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Header -->
     <header>
         <div class="container nav-container">
@@ -414,8 +580,6 @@
                     </div>
                 </div>
                 
-
-                
                 <div class="product-card">
                     <div class="product-img">
                         <img src="https://res.cloudinary.com/dzr2maxfg/image/upload/v1756869909/photo_2025-09-03_00-24-39_zh7gcl.jpg" alt="Bermuda Sarja Masculina - Terrace Store Porto da Folha">
@@ -447,10 +611,6 @@
                         <p>R$ -----</p>
                     </div>
                      </div>
-                
-
-                    
-                    
                 </div>
             </div>
         </div>
@@ -499,5 +659,125 @@
             </div>
         </div>
     </footer>
+
+    <script>
+        // Configuração do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyCU8MvIGFvS-OZ9gaB5sc68c1rwbQ3nAfo",
+            authDomain: "classickids-eb0ba.firebaseapp.com",
+            databaseURL: "https://classickids-eb0ba.firebaseio.com",
+            projectId: "classickids-eb0ba",
+            storageBucket: "classickids-eb0ba.firebasestorage.app",
+            messagingSenderId: "1092280932794",
+            appId: "1:1092280932794:web:08dc7b6e0c18cfd4c34a0f",
+            measurementId: "G-EL9EYJMSYV"
+        };
+
+        // Inicializa Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Referência para o nó TSstore
+        const tsStoreRef = database.ref('TSstore');
+
+        // Elementos DOM
+        const nomesTrack = document.getElementById('nomesTrack');
+
+        // Função para extrair APENAS o nome do cliente (último elemento do array)
+        function extrairNome(valor) {
+            if (!valor) return null;
+            
+            // Se for string, tenta parsear como JSON
+            if (typeof valor === 'string') {
+                try {
+                    const parsed = JSON.parse(valor);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        // Último elemento do array é o nome
+                        return parsed[parsed.length - 1];
+                    }
+                } catch (e) {
+                    // Se não for JSON válido, tenta extrair com regex
+                    const match = valor.match(/"([^"]*)"\]\s*$/);
+                    if (match) return match[1];
+                }
+            }
+            
+            // Se já for um array
+            if (Array.isArray(valor) && valor.length > 0) {
+                return valor[valor.length - 1];
+            }
+            
+            return null;
+        }
+
+        // Função para carregar e exibir os nomes
+        function carregarNomes() {
+            tsStoreRef.once('value')
+                .then((snapshot) => {
+                    const dados = snapshot.val();
+                    const nomes = [];
+                    
+                    if (dados) {
+                        // Itera sobre cada cliente no nó TSstore
+                        Object.keys(dados).forEach((key) => {
+                            const cliente = dados[key];
+                            const nome = extrairNome(cliente);
+                            
+                            if (nome && typeof nome === 'string' && nome.trim() !== '') {
+                                // Filtra nomes que parecem ser números de telefone ou valores indesejados
+                                const nomeLimpo = nome.trim();
+                                // Ignora se for apenas números ou se parecer um telefone
+                                if (!/^[\d\s\(\)\-]+$/.test(nomeLimpo) && nomeLimpo.length > 1) {
+                                    nomes.push(nomeLimpo);
+                                }
+                            }
+                        });
+                    }
+                    
+                    // Remove duplicatas
+                    const nomesUnicos = [...new Set(nomes)];
+                    
+                    // Atualiza o marquee
+                    atualizarMarquee(nomesUnicos);
+                })
+                .catch((error) => {
+                    console.error('Erro ao carregar dados do Firebase:', error);
+                    nomesTrack.innerHTML = '<span style="color: #ff6b6b;">⚠️ Erro ao carregar participantes. Tente novamente.</span>';
+                });
+        }
+
+        // Função para atualizar o marquee com os nomes
+        function atualizarMarquee(nomes) {
+            if (!nomes || nomes.length === 0) {
+                nomesTrack.innerHTML = '<span style="color: #D4A762;">📢 Nenhum participante cadastrado ainda. Seja o primeiro!</span>';
+                return;
+            }
+
+            // Duplica a lista para criar o efeito infinito
+            const nomesDuplicados = [...nomes, ...nomes, ...nomes];
+            
+            // Cria o HTML com os nomes
+            let html = '';
+            nomesDuplicados.forEach((nome, index) => {
+                html += `<span>${nome}</span>`;
+            });
+            
+            nomesTrack.innerHTML = html;
+            
+            // Ajusta a duração da animação baseado na quantidade de nomes
+            const totalNomes = nomes.length;
+            // Quanto mais nomes, mais lento (entre 15s e 60s)
+            const duracao = Math.max(15, Math.min(60, totalNomes * 1.2));
+            nomesTrack.style.animationDuration = duracao + 's';
+        }
+
+        // Carrega os nomes ao iniciar
+        document.addEventListener('DOMContentLoaded', function() {
+            carregarNomes();
+            
+            // Recarrega a cada 5 minutos para manter atualizado
+            setInterval(carregarNomes, 300000);
+        });
+    </script>
 </body>
 </html>
