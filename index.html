@@ -1,6 +1,3 @@
-
-
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -149,7 +146,7 @@
         }
         
         .nome-atual {
-            font-size: 1.4rem;
+            font-size: 1.6rem;
             font-weight: 700;
             color: #F6ECDD;
             letter-spacing: 1px;
@@ -157,12 +154,13 @@
             transition: all 0.5s ease;
             position: relative;
             padding: 0 10px;
+            text-align: center;
         }
         
         .nome-atual .icone-fogos {
             display: inline-block;
             margin: 0 8px;
-            font-size: 1.2rem;
+            font-size: 1.4rem;
             animation: estourar 0.5s ease;
         }
         
@@ -183,33 +181,6 @@
             100% { transform: scale(1) rotate(0deg); opacity: 1; }
         }
         
-        .nome-atual .badge-numero {
-            display: inline-block;
-            background: #D4A762;
-            color: #271705;
-            font-size: 0.7rem;
-            font-weight: 700;
-            padding: 2px 10px;
-            border-radius: 20px;
-            margin-left: 10px;
-            vertical-align: middle;
-            animation: surgirNome 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        
-        /* Contador de participantes */
-        .contador-participantes {
-            font-size: 0.75rem;
-            color: #D4A762;
-            opacity: 0.8;
-            margin-left: 15px;
-            white-space: nowrap;
-        }
-        
-        .contador-participantes span {
-            font-weight: 700;
-            font-size: 1rem;
-        }
-        
         /* Indicador de carregamento */
         .loading-nomes {
             color: #aaa;
@@ -226,7 +197,7 @@
             100% { transform: rotate(360deg); }
         }
         
-        /* Partículas de confete (opcional) */
+        /* Partículas de confete */
         .confete {
             position: absolute;
             width: 8px;
@@ -518,7 +489,7 @@
             }
             
             .nome-atual {
-                font-size: 1.1rem;
+                font-size: 1.2rem;
             }
             
             .nav-container {
@@ -557,7 +528,6 @@
                 <div class="nome-atual" id="nomeAtual">
                     <span class="loading-nomes"><i class="fas fa-spinner"></i> Carregando...</span>
                 </div>
-
             </div>
         </div>
     </section>
@@ -713,7 +683,7 @@
 
     <script>
         // Configuração do Firebase
-          const firebaseConfig = {
+        const firebaseConfig = {
             apiKey: "AIzaSyCU8MvIGFvS-OZ9gaB5sc68c1rwbQ3nAfo",
             authDomain: "classickids-eb0ba.firebaseapp.com",
             databaseURL: "https://classickids-eb0ba.firebaseio.com",
@@ -733,7 +703,6 @@
 
         // Elementos DOM
         const nomeAtualEl = document.getElementById('nomeAtual');
-        const totalParticipantesEl = document.getElementById('totalParticipantes');
 
         // Variáveis de controle
         let nomes = [];
@@ -813,11 +782,10 @@
             const emojis = ['🎉', '🔥', '⭐', '💥', '✨', '🎊', '🏆'];
             const emoji = emojis[Math.floor(Math.random() * emojis.length)];
             
-            // Cria o HTML com animação
+            // Cria o HTML com animação - APENAS O NOME
             nomeAtualEl.innerHTML = `
                 <span class="icone-fogos">${emoji}</span>
                 <span class="destaque-nome">${nome}</span>
-                <span class="badge-numero">#${indiceAtual + 1}</span>
             `;
             
             // Efeito de confetes
@@ -846,12 +814,9 @@
                         });
                     }
                     
-                    // Remove duplicatas e embaralha
+                    // Remove duplicatas
                     const nomesUnicos = [...new Set(nomesLista)];
                     nomes = nomesUnicos;
-                    
-                    // Atualiza contador
-                    totalParticipantesEl.textContent = nomes.length;
                     
                     // Inicia ou reinicia o ciclo de exibição
                     if (nomes.length > 0) {
@@ -868,7 +833,6 @@
                         intervaloNomes = setInterval(mostrarProximoNome, 2000);
                     } else {
                         nomeAtualEl.innerHTML = '<span style="color: #D4A762;">📢 Nenhum participante cadastrado ainda.</span>';
-                        totalParticipantesEl.textContent = '0';
                     }
                 })
                 .catch((error) => {
